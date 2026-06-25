@@ -1,0 +1,1510 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>测一测，你在投资上是什么星座？</title>
+    <style>
+        /* ===== 全局重置 & 字体 ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+            background: #0A1628;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 12px;
+        }
+
+        .app {
+            position: relative;
+            width: 100%;
+            max-width: 420px;
+            min-height: 700px;
+            background: linear-gradient(175deg, #0A1628 0%, #0B1A33 50%, #0D1F3C 100%);
+            border-radius: 36px;
+            padding: 20px 20px 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+            overflow: hidden;
+            color: #fff;
+        }
+
+        /* ===== 星星层 ===== */
+        .stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+            border-radius: 36px;
+        }
+        .star {
+            position: absolute;
+            background: #fff;
+            border-radius: 50%;
+            animation: twinkle var(--dur) ease-in-out infinite alternate;
+            animation-delay: var(--delay);
+        }
+        @keyframes twinkle {
+            0% { opacity: 0.15;
+                transform: scale(0.7); }
+            100% { opacity: 1;
+                transform: scale(1.3); }
+        }
+
+        /* ===== 内容区 ===== */
+        .content {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 650px;
+        }
+
+        /* ============================================================
+           封面页
+           ============================================================ */
+        #coverPage {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 650px;
+            position: relative;
+            border-radius: 28px;
+            overflow: hidden;
+        }
+        #coverPage .cover-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 28px;
+            pointer-events: none;
+        }
+        #coverPage .cover-btn-wrap {
+            position: relative;
+            z-index: 2;
+            margin-top: auto;
+            margin-bottom: 20px;
+            width: 80%;
+            max-width: 260px;
+        }
+.btn-start {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    width: 100%;
+    max-width: 320px;
+    padding: 16px 24px;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.20);
+    border-radius: 60px;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+}
+
+.btn-start:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: scale(1.02);
+}
+
+.btn-start:active {
+    transform: scale(0.96);
+}
+
+.btn-deco {
+    font-size: 20px;
+    font-weight: 300;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+        /* ============================================================
+           答题页
+           ============================================================ */
+        #quizPage {
+            display: none;
+            flex-direction: column;
+            min-height: 620px;
+            padding-top: 6px;
+        }
+        #quizPage.active {
+            display: flex;
+        }
+
+        .quiz-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+            flex-shrink: 0;
+        }
+        .logo {
+            height: 32px;
+            width: auto;
+            display: block;
+            opacity: 0.35;
+        }
+        .logo-placeholder {
+            height: 36px;
+            width: 36px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 9px;
+            color: rgba(255, 255, 255, 0.20);
+            border: 1px dashed rgba(255, 255, 255, 0.08);
+            flex-shrink: 0;
+        }
+        .quiz-brand {
+            font-size: 13px;
+            font-weight: 400;
+            color: rgba(255, 255, 255, 0.35);
+            letter-spacing: 0.5px;
+            margin-left: auto; 
+        }
+
+        /* 进度条 */
+        .progress-wrap {
+            margin-bottom: 28px;
+            flex-shrink: 0;
+        }
+        .progress-track {
+            position: relative;
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.10);
+            border-radius: 4px;
+            margin-top: 6px;
+        }
+        .progress-fill {
+            width: 0%;
+            height: 100%;
+            background: #004E86;
+            border-radius: 4px;
+            transition: width 0.4s ease;
+        }
+        .shark-icon {
+            position: absolute;
+            top: 50%;
+            left: 0%;
+            transform: translate(-50%, -50%);
+            font-size: 40px;
+            transition: left 0.45s cubic-bezier(0.34, 1.2, 0.64, 1);
+            filter: drop-shadow(0 0 8px rgba(0, 78, 134, 0.5));
+            line-height: 1;
+            will-change: left;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+        }
+        .shark-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+        .shark-icon .fallback-emoji {
+            font-size: 22px;
+            line-height: 1;
+        }
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.30);
+            letter-spacing: 0.3px;
+        }
+
+        /* 题号 */
+        .q-number {
+            font-size: 12px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.25);
+            margin-bottom: 8px;
+            flex-shrink: 0;
+            letter-spacing: 1px;
+        }
+
+        /* 题目 */
+        .question-text {
+            font-size: 20px;
+            font-weight: 600;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            flex-shrink: 0;
+            color: #fff;
+            letter-spacing: 0.3px;
+        }
+
+        /* 选项列表 */
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            flex: 1;
+            margin-bottom: 12px;
+        }
+        .option {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1.5px solid rgba(255, 255, 255, 0.07);
+            border-radius: 16px;
+            padding: 15px 16px;
+            font-size: 15px;
+            line-height: 1.5;
+            color: #E8ECF1;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+            backdrop-filter: blur(2px);
+            -webkit-tap-highlight-color: transparent;
+            letter-spacing: 0.2px;
+        }
+        .option:active {
+            transform: scale(0.97);
+        }
+        .option.selected {
+            border-color: #004E86;
+            background: rgba(0, 78, 134, 0.20);
+            box-shadow: 0 0 0 2px rgba(0, 78, 134, 0.12);
+        }
+        .option .tag {
+            display: inline-block;
+            width: 22px;
+            height: 22px;
+            line-height: 22px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            font-size: 11px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.30);
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+        .option.selected .tag {
+            background: #004E86;
+            color: #fff;
+        }
+        .option-inner {
+            display: flex;
+            align-items: flex-start;
+        }
+
+        /* 上一题按钮 */
+        .nav-back {
+            text-align: center;
+            padding: 6px 0 2px;
+            flex-shrink: 0;
+        }
+        .nav-back button {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.25);
+            font-size: 13px;
+            cursor: pointer;
+            padding: 6px 16px;
+            transition: color 0.2s;
+            letter-spacing: 0.5px;
+        }
+        .nav-back button:active {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        .nav-back button.hidden-btn {
+            visibility: hidden;
+        }
+
+        /* ============================================================
+           完成确认页
+           ============================================================ */
+        #confirmPage {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 500px;
+            text-align: center;
+            padding: 20px 20px 30px;
+            animation: fadeIn 0.3s ease;
+        }
+        #confirmPage.active {
+            display: flex;
+        }
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        .confirm-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+           .confirm-icon-img {
+              width: 220px;
+              height: 220px;
+             object-fit: contain;
+             margin-bottom: 16px;
+            border-radius: 12px;
+            margin-top: 20px;
+}
+        .confirm-title {
+            font-size: 28px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 6px;
+            letter-spacing: 1px;
+        }
+        .confirm-sub {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.35);
+            margin-bottom: 28px;
+        }
+        .confirm-btns {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+            max-width: 280px;
+            margin: 0 auto; 
+        }
+        .confirm-btns button {
+            flex: 1;
+            padding: 14px 0;
+            border-radius: 30px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            letter-spacing: 0.5px;
+        }
+        .confirm-btns button:active {
+            transform: scale(0.96);
+        }
+        .btn-confirm-back {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            color: rgba(255, 255, 255, 0.50);
+        }
+        .btn-confirm-result {
+            background: #004E86;
+            color: #fff;
+            box-shadow: 0 4px 16px rgba(0, 78, 134, 0.35);
+        }
+
+        /* ============================================================
+           结果页
+           ============================================================ */
+        #resultPage {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            animation: fadeIn 0.3s ease;
+            min-height: 620px;
+            margin-top: -12px;
+        }
+        #resultPage.active {
+            display: flex;
+        }
+
+        .result-label {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.35);
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+        .result-constellation {
+            font-size: 34px;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: 2px;
+            line-height: 1.3;
+        }
+        .result-image {
+            width: 100%;
+            max-width: 240px;
+            aspect-ratio: 1/1;
+            object-fit: contain;
+            border-radius: 18px;
+            margin: 12px auto 16px;
+            background: rgba(255, 255, 255, 0.02);
+        }
+        .result-motto {
+            font-size: 22px;
+            font-weight: 700;
+            color: #F5C518;
+            letter-spacing: 3px;
+            margin-bottom: 12px;
+        }
+
+        /* 卡片区 — 描述 + 小贴士 分开两个卡片 */
+        .result-card {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            border-radius: 18px;
+            padding: 16px 18px;
+            margin-bottom: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            text-align: left;
+        }
+        .result-card:last-of-type {
+            margin-bottom: 0;
+        }
+        .result-desc {
+            font-size: 15px;
+            line-height: 1.8;
+            color: #D0D9E5;
+            text-align: justify;
+        }
+        .result-desc strong {
+            color: #fff;
+            font-weight: 600;
+        }
+        .result-tip-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #F5C518;
+            letter-spacing: 1px;
+            text-align: justify;
+            margin-bottom: 2px;
+        }
+        .result-tip {
+            font-size: 14px;
+            line-height: 1.7;
+            color: #B0C0D0;
+        }
+
+        /* 按钮组 */
+        .result-actions {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+            margin-top: 14px;
+        }
+        .result-actions button {
+            flex: 1;
+            padding: 13px 0;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            letter-spacing: 0.5px;
+        }
+        .result-actions button:active {
+            transform: scale(0.96);
+        }
+        .btn-retry {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            color: rgba(255, 255, 255, 0.50);
+        }
+        .btn-share {
+            background: #004E86;
+            color: #fff;
+            box-shadow: 0 4px 16px rgba(0, 78, 134, 0.35);
+        }
+
+        /* 底部合规 */
+        .result-footer {
+            width: 100%;
+            text-align: center;
+            padding-top: 18px;
+            margin-top: 8px;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .result-footer small {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.15);
+            letter-spacing: 0.3px;
+            line-height: 1.6;
+        }
+
+        /* ============================================================
+           分享弹窗 (遮罩 + 卡片) — 9:16 竖长版
+           ============================================================ */
+        .share-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            animation: fadeInOverlay 0.3s ease;
+        }
+        .share-overlay.active {
+            display: flex;
+        }
+        @keyframes fadeInOverlay {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        .share-modal {
+            position: relative;
+            width: 100%;
+            max-width: 340px;
+            border-radius: 28px;
+            overflow: hidden;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.9);
+            animation: scaleIn 0.35s cubic-bezier(0.34, 1.2, 0.64, 1);
+        }
+        @keyframes scaleIn {
+            0% { transform: scale(0.9);
+                opacity: 0; }
+            100% { transform: scale(1);
+                opacity: 1; }
+        }
+
+        .share-modal .close-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            z-index: 10;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.10);
+            color: #fff;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            line-height: 1;
+        }
+        .share-modal .close-btn:active {
+            transform: scale(0.92);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* 卡片比例 9:16 */
+        .share-modal .share-card-inner {
+            width: 100%;
+            aspect-ratio: 9 / 16;
+            background: linear-gradient(160deg, #0A1628 0%, #0B1A33 45%, #0D1F3C 100%);
+            padding: 18px 22px 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .share-modal .share-card-inner .share-stars-modal {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        .share-modal .share-card-inner .share-star-modal {
+            position: absolute;
+            background: #fff;
+            border-radius: 50%;
+            animation: twinkle 3s ease-in-out infinite alternate;
+            animation-delay: var(--delay, 0s);
+        }
+
+        .share-modal .share-content {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* --- 顶部 Logo --- */
+        .share-modal .share-top-logo {
+            height: 30px;
+            width: auto;
+            object-fit: contain;
+           margin-top: -16px;
+            margin-bottom: 48px;
+        }
+        .share-modal .share-top-logo-placeholder {
+            height: 40px;
+            width: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border: 1px dashed rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8px;
+            color: rgba(255, 255, 255, 0.15);
+            margin-bottom: 20px;
+        }
+
+        /* --- 引导语 (大号) --- */
+        .share-modal .share-guide {
+            font-size: 20px;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+            line-height: 1.3;
+        }
+
+        /* --- "我测出来是" 小字 --- */
+        .share-modal .share-label {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.35);
+            letter-spacing: 1px;
+            margin-bottom: 0px;
+        }
+
+        /* --- 星座名 (大号突出) --- */
+        .share-modal .share-constellation {
+            font-size: 38px;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: 2px;
+            line-height: 1.2;
+            margin-bottom: 4px;
+        }
+
+        /* --- 插画 (放大) --- */
+        .share-modal .share-image {
+            width: 160px;
+            height: 160px;
+            object-fit: contain;
+            border-radius: 16px;
+            margin: 4px auto 6px;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        /* --- 底部大二维码 + 引导语 --- */
+        .share-modal .share-bottom {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            margin-top: 4px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            padding-top: 14px;
+        }
+        .share-modal .share-qr-large {
+            height: 100px;
+            width: 100px;
+            object-fit: contain;
+            border-radius: 8px;
+            background: #fff;
+            padding: 5px;
+        }
+        .share-modal .share-qr-placeholder {
+            height: 88px;
+            width: 88px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border: 1px dashed rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.15);
+            text-align: center;
+            line-height: 1.3;
+        }
+        .share-modal .share-bottom-hint {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.30);
+            letter-spacing: 0.5px;
+            margin-top: 12px;
+        }
+
+        .share-modal .save-hint {
+            position: absolute;
+            bottom: -48px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.35);
+            font-size: 12px;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 4px 16px;
+            border-radius: 20px;
+            backdrop-filter: blur(4px);
+        }
+
+        /* ===== 工具类 ===== */
+        .hidden {
+            display: none !important;
+        }
+
+        /* ===== 适配 ===== */
+        @media (max-width: 440px) {
+            .app {
+                padding: 16px 14px 20px;
+                border-radius: 28px;
+                min-height: 640px;
+            }
+            .question-text {
+                font-size: 18px;
+            }
+            .option {
+                padding: 13px 14px;
+                font-size: 14px;
+            }
+            .result-constellation {
+                font-size: 28px;
+            }
+            .result-motto {
+                font-size: 18px;
+            }
+            .result-image {
+                max-width: 200px;
+            }
+            .shark-icon {
+                width: 28px;
+                height: 28px;
+            }
+            .shark-icon .fallback-emoji {
+                font-size: 18px;
+            }
+            .share-modal {
+                max-width: 300px;
+            }
+            .share-modal .share-image {
+                width: 110px;
+                height: 110px;
+            }
+            .share-modal .share-constellation {
+                font-size: 30px;
+            }
+            .share-modal .share-guide {
+                font-size: 17px;
+            }
+            .share-modal .share-qr-large {
+                height: 74px;
+                width: 74px;
+            }
+            .share-modal .share-card-inner {
+                padding: 22px 16px 18px;
+            }
+            .share-modal .save-hint {
+                font-size: 10px;
+                bottom: -40px;
+                padding: 3px 12px;
+            }
+            .share-modal .share-bottom-hint {
+                font-size: 11px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app" id="app">
+        <!-- 星星层 -->
+        <div class="stars" id="stars"></div>
+
+        <div class="content">
+
+            <!-- ==========================================================
+            封面页
+            ========================================================== -->
+            <div id="coverPage">
+                <img class="cover-image" id="coverImage" src="封面图.png" alt="封面" />
+                <div class="cover-btn-wrap">
+                   <button class="btn-start" id="btnStart">
+    <span class="btn-deco">✦</span>
+    立即开始测试
+    <span class="btn-deco">✦</span>
+</button>
+                </div>
+            </div>
+
+            <!-- ==========================================================
+            答题页
+            ========================================================== -->
+            <div id="quizPage">
+                <!-- 顶栏：logo + 品牌名 -->
+                <div class="quiz-header">
+                    <img class="logo" id="quizLogo" src="logo.png" alt="logo" onerror="this.style.display='none';document.getElementById('quizLogoPlaceholder').style.display='flex'" />
+                    <div class="logo-placeholder" id="quizLogoPlaceholder" style="display:none;">LOGO</div>
+                    <span class="quiz-brand">夏普鲨 · 星座系列</span>
+                </div>
+
+                <!-- 进度条 -->
+                <div class="progress-wrap">
+                    <div class="progress-label">
+                        <span id="progressText">1 / 8</span>
+                        <span id="progressPercent">0%</span>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-fill" id="progressFill"></div>
+                        <span class="shark-icon" id="sharkIcon">
+                            <img src="shark-icon.png" alt="🦈" id="sharkImg" onerror="this.style.display='none';document.getElementById('sharkFallback').style.display='inline'" />
+                            <span class="fallback-emoji" id="sharkFallback" style="display:none;">🦈</span>
+                        </span>
+                    </div>
+                </div>
+
+                <!-- 题号 -->
+                <div class="q-number" id="qNumber">第 1 题</div>
+
+                <!-- 题目 -->
+                <div class="question-text" id="questionText">加载中…</div>
+
+                <!-- 选项 -->
+                <div class="options" id="optionsContainer"></div>
+
+                <!-- 上一题 -->
+                <div class="nav-back">
+                    <button id="prevBtn" class="hidden-btn">上一题</button>
+                </div>
+            </div>
+
+            <!-- ==========================================================
+            完成确认页
+            ========================================================== -->
+            <div id="confirmPage">
+                <img class="confirm-icon-img" src="images/撒花.png" alt="完成" />
+                <div class="confirm-title">全部答完啦！</div>
+                <div class="confirm-sub">确认提交 or 返回检查？</div>
+                <div class="confirm-btns">
+                    <button class="btn-confirm-back" id="confirmBackBtn">返回修改</button>
+                    <button class="btn-confirm-result" id="confirmResultBtn">查看结果</button>
+                </div>
+            </div>
+
+            <!-- ==========================================================
+            结果页
+            ========================================================== -->
+            <div id="resultPage">
+                <div class="result-label">你的投资人格是</div>
+                <div class="result-constellation" id="resultName">——</div>
+
+                <img class="result-image" id="resultImage" src="" alt="星座插画" />
+
+                <div class="result-motto" id="resultMotto">——</div>
+
+                <!-- 卡片1: 描述 -->
+                <div class="result-card">
+                    <div class="result-desc" id="resultDesc"></div>
+                </div>
+
+                <!-- 卡片2: 小贴士 -->
+                <div class="result-card">
+                    <div class="result-tip-title">💡 小贴士</div>
+                    <div class="result-tip" id="resultTip"></div>
+                </div>
+
+                <!-- 按钮组 -->
+                <div class="result-actions">
+                    <button class="btn-retry" id="retryBtn">重新测试</button>
+                    <button class="btn-share" id="shareBtn">分享结果</button>
+                </div>
+
+                <!-- 底部合规 -->
+                <div class="result-footer">
+                    <small>市场有风险，投资需谨慎。本测试仅供娱乐参考，不构成投资建议。</small>
+                </div>
+            </div>
+
+        </div><!-- /content -->
+    </div><!-- /app -->
+
+    <!-- ==========================================================
+    分享弹窗 (遮罩 + 卡片) — 9:16 竖长版
+    ========================================================== -->
+    <div class="share-overlay" id="shareOverlay">
+        <div class="share-modal" id="shareModal">
+            <button class="close-btn" id="shareCloseBtn">✕</button>
+            <div class="share-card-inner" id="shareCardInner">
+                <div class="share-stars-modal" id="shareStarsModal"></div>
+                <div class="share-content">
+
+                    <!-- 顶部 Logo -->
+                    <img class="share-top-logo" id="shareLogoTop" src="logo.png" alt="logo" onerror="this.style.display='none';document.getElementById('shareLogoTopPlaceholder').style.display='flex'" />
+                    <div class="share-top-logo-placeholder" id="shareLogoTopPlaceholder" style="display:none;">LOGO</div>
+
+                    <!-- 引导语 -->
+                    <div class="share-guide">8道题测出你在投资上的星座</div>
+
+                    <!-- "我测出来是" -->
+                    <div class="share-label">我测出来是</div>
+
+                    <!-- 星座名 -->
+                    <div class="share-constellation" id="shareNameModal">——</div>
+
+                    <!-- 插画 -->
+                    <img class="share-image" id="shareImageModal" src="" alt="星座" />
+
+                    <!-- 底部大二维码 + 引导语 -->
+                    <div class="share-bottom">
+                        <img class="share-qr-large" id="shareQrLarge" src="qrcode.png" alt="二维码" onerror="this.style.display='none';document.getElementById('shareQrLargePlaceholder').style.display='flex'" />
+                        <div class="share-qr-placeholder" id="shareQrLargePlaceholder" style="display:none;">二维码</div>
+                        <div class="share-bottom-hint">长按保存 · 分享你的投资星座</div>
+                    </div>
+
+                </div>
+                <div class="save-hint">长按图片保存 · 分享给朋友</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        //  1. 题库（8题）
+        // ============================================================
+        const QUESTIONS = [{
+            text: '当你看好一个方向，你通常会怎么做？',
+            options: [
+                '先拿一小笔钱试试，感觉对了再加',
+                '把它研究透，想清楚了再一次性投入',
+                '看准了就果断出手，不想错过'
+            ]
+        }, {
+            text: '市场突然大跌，你的第一反应是？',
+            options: [
+                '先冷静看看发生了什么，不急着操作',
+                '感觉可能是机会来了',
+                '检查一下自己手里的东西有没有问题'
+            ]
+        }, {
+            text: '选一个投资品种时，你最看重什么？',
+            options: [
+                '它未来有没有持续增长的空间',
+                '现在的价格合不合理、值不值得买',
+                '最近大家是不是都在讨论它'
+            ]
+        }, {
+            text: '你买了一个产品，持有一段时间不涨不跌，你会？',
+            options: [
+                '继续拿着，相信自己的判断',
+                '换一个更活跃的',
+                '趁没跌再买一点'
+            ]
+        }, {
+            text: '投资赚到一笔钱后，你通常会？',
+            options: [
+                '总结一下这次做对了什么',
+                '赶紧找下一个机会',
+                '先落袋为安，等合适的时候再说'
+            ]
+        }, {
+            text: '遇到一个你完全没接触过的新产品，你的态度是？',
+            options: [
+                '想试试，但先少投一点',
+                '先看看别人怎么样，不着急',
+                '先搞懂它到底靠什么赚钱再决定'
+            ]
+        }, {
+            text: '你买的一个产品跌了20%，你通常会？',
+            options: [
+                '卖掉，保住剩下的钱',
+                '再买一点，把成本拉低',
+                '放着不动，等它自己涨回来'
+            ]
+        }, {
+            text: '做投资决定时，你更相信什么？',
+            options: [
+                '自己的分析和判断',
+                '专业机构的研究报告',
+                '朋友推荐或者大家都在买什么'
+            ]
+        }];
+
+        // ============================================================
+        //  2. 星座匹配表
+        // ============================================================
+        const MATCH_MAP = {
+            1: { A: ['双子', '射手', '双鱼'], B: ['处女', '天蝎', '摩羯'], C: ['白羊', '狮子', '水瓶'] },
+            2: { A: ['金牛', '天秤', '摩羯'], B: ['白羊', '射手', '水瓶'], C: ['巨蟹', '处女', '天蝎'] },
+            3: { A: ['射手', '水瓶', '双鱼'], B: ['金牛', '巨蟹', '处女'], C: ['双子', '狮子', '天秤'] },
+            4: { A: ['金牛', '狮子', '摩羯'], B: ['双子', '射手', '水瓶'], C: ['白羊', '巨蟹', '双鱼'] },
+            5: { A: ['处女', '天蝎', '摩羯'], B: ['白羊', '狮子', '射手'], C: ['金牛', '天秤', '双鱼'] },
+            6: { A: ['白羊', '双子', '射手'], B: ['巨蟹', '天秤', '双鱼'], C: ['金牛', '处女', '天蝎'] },
+            7: { A: ['金牛', '天秤', '巨蟹'], B: ['白羊', '狮子', '双鱼'], C: ['摩羯', '处女', '射手'] },
+            8: { A: ['狮子', '天蝎', '水瓶'], B: ['金牛', '处女', '摩羯'], C: ['双子', '天秤', '双鱼'] }
+        };
+
+        // ============================================================
+        //  3. 星座结果数据
+        // ============================================================
+        const CONSTELLATIONS = {
+            '白羊': {
+                motto: '冲锋向前 · 无畏开局',
+                desc: '⭐你是一个<strong>敢于行动</strong>的投资者。当机会出现时，你是那个最先站起来的人。快速决断、敢于承担风险，是你的核心优势。',
+                tip: '你擅长冲锋，但也别忘了设置好止盈止损线——让勇气和纪律同行，你的爆发力会更有持续性。'
+            },
+            '金牛': {
+                motto: '稳健踏实 · 长期主义',
+                desc: '⭐你是一个<strong>稳如磐石</strong>的投资者。你不追热点、不慌波动，相信时间会奖励耐心的人。长期主义是你的投资信仰。',
+                tip: '你的定力很强，偶尔也可以关注一下新赛道的机会——在稳健的基础上，给组合加一点想象力。'
+            },
+            '双子': {
+                motto: '思维敏捷 · 多维破局',
+                desc: '⭐你是一个<strong>灵活应变</strong>的投资者。你的思维快、信息广，总能从多个角度找到破局点。市场波动对你来说不是风险，而是机会。',
+                tip: '你的优势是灵活，但要小心过度交易——给每一个决策留一点冷静期，让判断更笃定。'
+            },
+            '巨蟹': {
+                motto: '心怀热忱 · 守护价值',
+                desc: '⭐你是一个<strong>注重安全</strong>的投资者。你选标的像挑家人一样认真——看重长期价值、看重护城河。守护本金是你的本能。',
+                tip: '你的防守能力很强，偶尔可以适度放开进攻性——好公司值得长期陪伴，但也别忘了给自己留一点弹性。'
+            },
+            '狮子': {
+                motto: '王者风范 · 自信领航',
+                desc: '⭐你是一个<strong>自信果敢</strong>的投资者。你有自己清晰的投资体系，一旦认准方向就敢于重仓出击。领袖气质是你的标签。',
+                tip: '你的判断力很强，但也值得多听听反方的声音——让自信和谦逊并存，会让你的决策更加锋利。'
+            },
+            '处女': {
+                motto: '追求完美 · 精益求精',
+                desc: '⭐你是一个<strong>深度研究</strong>的投资者。你不出手则已，一出手就是深思熟虑。精准是你的信仰。',
+                tip: '研究是你的超能力，但市场永远有不确定性——接受"足够好"而不是"完美"，会让你更从容。'
+            },
+            '天秤': {
+                motto: '理性平衡 · 价值判断',
+                desc: '⭐你是一个<strong>理性均衡</strong>的投资者。你擅长在风险和收益之间找平衡，永远不会把鸡蛋放在一个篮子里。配置思维是你的核心优势。',
+                tip: '均衡是你的底色，但偶尔也可以在极端时刻大胆一点——当市场恐慌时，你的理性判断往往最有价值。'
+            },
+            '天蝎': {
+                motto: '洞察深邃 · 决策果敢',
+                desc: '⭐你是一个<strong>深度洞察</strong>的投资者。你不轻易出手，但每次出手都经过缜密推演。一旦决定，果断而坚定——你是市场里的狙击手。',
+                tip: '你的洞察力是天赋，但也要记得保持一定的仓位弹性——再确定的判断，也值得为意外留一点余地。'
+            },
+            '射手': {
+                motto: '探索未知 · 志在远方',
+                desc: '⭐你是一个<strong>远见卓识</strong>的投资者。你看的不是明天，而是未来三到五年的趋势。你相信真正的回报来自长久的陪伴和坚定的信念。',
+                tip: '你有大方向的直觉，但长路上总有颠簸——适当关注短期节奏，可以让你的坚守更从容。'
+            },
+            '摩羯': {
+                motto: '脚踏实地 · 终成大器',
+                desc: '⭐你是一个<strong>纪律至上</strong>的投资者。你知道真正的财富来自日复一日的坚持。',
+                tip: '你的纪律性极强，但市场有时也需要灵活变通——在极端估值时加大力度，在狂热时适度收手，会让你的定投更高效。'
+            },
+            '水瓶': {
+                motto: '创新思维 · 未来先行',
+                desc: '⭐你是一个<strong>前瞻创新</strong>的投资者。你对新事物有天然的敏锐度，总能在大多数人之前发现下一个大趋势。未来是你的主场。',
+                tip: '你的前瞻性很强，但新赛道往往伴随高波动——用仓位控制代替全情投入，让你的想象力更可持续。'
+            },
+            '双鱼': {
+                motto: '直觉敏锐 · 想象无限',
+                desc: '⭐你是一个<strong>直觉敏锐</strong>的投资者。你有超乎常人的共情能力和感知力，总能捕捉到市场情绪的微妙变化。灵感是你的秘密武器。',
+                tip: '你的直觉很宝贵，但也值得用数据和逻辑来验证——让感性和理性并肩作战，你的判断会更加有力。'
+            }
+        };
+
+        // ============================================================
+        //  4. 状态
+        // ============================================================
+        const state = {
+            current: 0,
+            scores: {
+                '白羊': 0,
+                '金牛': 0,
+                '双子': 0,
+                '巨蟹': 0,
+                '狮子': 0,
+                '处女': 0,
+                '天秤': 0,
+                '天蝎': 0,
+                '射手': 0,
+                '摩羯': 0,
+                '水瓶': 0,
+                '双鱼': 0
+            },
+            answered: false,
+            selected: {},
+            resultConst: ''
+        };
+
+        // DOM 引用
+        const $ = id => document.getElementById(id);
+        const coverPage = $('coverPage');
+        const quizPage = $('quizPage');
+        const confirmPage = $('confirmPage');
+        const resultPage = $('resultPage');
+        const questionText = $('questionText');
+        const optionsContainer = $('optionsContainer');
+        const qNumber = $('qNumber');
+        const progressText = $('progressText');
+        const progressPercent = $('progressPercent');
+        const progressFill = $('progressFill');
+        const sharkIcon = $('sharkIcon');
+        const resultImage = $('resultImage');
+        const resultName = $('resultName');
+        const resultMotto = $('resultMotto');
+        const resultDesc = $('resultDesc');
+        const resultTip = $('resultTip');
+        const retryBtn = $('retryBtn');
+        const shareBtn = $('shareBtn');
+        const btnStart = $('btnStart');
+        const prevBtn = $('prevBtn');
+        const confirmBackBtn = $('confirmBackBtn');
+        const confirmResultBtn = $('confirmResultBtn');
+
+        // 分享弹窗元素
+        const shareOverlay = $('shareOverlay');
+        const shareCloseBtn = $('shareCloseBtn');
+        const shareNameModal = $('shareNameModal');
+        const shareImageModal = $('shareImageModal');
+
+        // ============================================================
+        //  5. 页面切换
+        // ============================================================
+        function showCover() {
+            coverPage.style.display = 'flex';
+            quizPage.classList.remove('active');
+            quizPage.style.display = 'none';
+            confirmPage.classList.remove('active');
+            confirmPage.style.display = 'none';
+            resultPage.classList.remove('active');
+            resultPage.style.display = 'none';
+        }
+
+        function showQuiz() {
+            coverPage.style.display = 'none';
+            quizPage.style.display = 'flex';
+            quizPage.classList.add('active');
+            confirmPage.classList.remove('active');
+            confirmPage.style.display = 'none';
+            resultPage.classList.remove('active');
+            resultPage.style.display = 'none';
+        }
+
+        function showConfirm() {
+            coverPage.style.display = 'none';
+            quizPage.classList.remove('active');
+            quizPage.style.display = 'none';
+            confirmPage.style.display = 'flex';
+            confirmPage.classList.add('active');
+            resultPage.classList.remove('active');
+            resultPage.style.display = 'none';
+        }
+
+        function showResult() {
+            coverPage.style.display = 'none';
+            quizPage.classList.remove('active');
+            quizPage.style.display = 'none';
+            confirmPage.classList.remove('active');
+            confirmPage.style.display = 'none';
+            resultPage.style.display = 'flex';
+            resultPage.classList.add('active');
+        }
+
+        // ============================================================
+        //  6. 渲染题目
+        // ============================================================
+        function renderQuestion(index) {
+            const q = QUESTIONS[index];
+            if (!q) return;
+
+            const prevSelected = state.selected[index] || null;
+            state.answered = !!prevSelected;
+
+            qNumber.textContent = `第 ${index+1} 题`;
+            questionText.textContent = q.text;
+
+            const labels = ['A', 'B', 'C'];
+
+            optionsContainer.innerHTML = q.options.map((opt, i) => {
+                const isSelected = (prevSelected === labels[i]);
+                return `
+                        <div class="option ${isSelected ? 'selected' : ''}" data-opt="${labels[i]}" onclick="selectOption('${labels[i]}')">
+                            <div class="option-inner">
+                                <span class="tag">${labels[i]}</span>
+                                <span>${opt}</span>
+                            </div>
+                        </div>
+                    `;
+            }).join('');
+
+            if (index === 0) {
+                prevBtn.classList.add('hidden-btn');
+            } else {
+                prevBtn.classList.remove('hidden-btn');
+            }
+
+            updateProgress(index);
+        }
+
+        // ============================================================
+        //  7. 进度条
+        // ============================================================
+        function updateProgress(index) {
+            const total = QUESTIONS.length;
+            const pct = (index / total) * 100;
+            progressFill.style.width = pct + '%';
+            sharkIcon.style.left = pct + '%';
+            progressText.textContent = `${index+1} / ${total}`;
+            progressPercent.textContent = Math.round(pct) + '%';
+        }
+
+        // ============================================================
+        //  8. 选择逻辑
+        // ============================================================
+        function selectOption(optKey) {
+            if (state.answered && state.selected[state.current] === optKey) return;
+
+            const idx = state.current;
+
+            const prevSelected = state.selected[idx];
+            if (prevSelected) {
+                const prevMatched = MATCH_MAP[idx + 1]?.[prevSelected] || [];
+                prevMatched.forEach(z => {
+                    if (state.scores[z] !== undefined) state.scores[z] -= 1;
+                });
+            }
+
+            state.selected[idx] = optKey;
+            const matched = MATCH_MAP[idx + 1]?.[optKey] || [];
+            matched.forEach(z => {
+                if (state.scores[z] !== undefined) state.scores[z] += 1;
+            });
+
+            state.answered = true;
+
+            const items = optionsContainer.querySelectorAll('.option');
+            items.forEach(el => {
+                if (el.dataset.opt === optKey) el.classList.add('selected');
+                else el.classList.remove('selected');
+            });
+
+            setTimeout(() => {
+                if (state.current < QUESTIONS.length - 1) {
+                    state.current += 1;
+                    renderQuestion(state.current);
+                } else {
+                    showConfirm();
+                    progressFill.style.width = '100%';
+                    sharkIcon.style.left = '100%';
+                    progressText.textContent = '8 / 8';
+                    progressPercent.textContent = '100%';
+                }
+            }, 300);
+        }
+        window.selectOption = selectOption;
+
+        // ============================================================
+        //  9. 上一题
+        // ============================================================
+        function goToPrev() {
+            if (state.current > 0) {
+                state.current -= 1;
+                renderQuestion(state.current);
+                if (confirmPage.classList.contains('active')) {
+                    showQuiz();
+                    updateProgress(state.current);
+                }
+            }
+        }
+        prevBtn.addEventListener('click', goToPrev);
+
+        // ============================================================
+        //  10. 确认页按钮
+        // ============================================================
+        confirmBackBtn.addEventListener('click', function() {
+            state.current = QUESTIONS.length - 1;
+            showQuiz();
+            renderQuestion(state.current);
+        });
+
+        confirmResultBtn.addEventListener('click', function() {
+            computeAndShowResult();
+        });
+
+        // ============================================================
+        //  11. 计算结果 & 展示
+        // ============================================================
+        function computeAndShowResult() {
+            let maxScore = -1;
+            let resultConst = '';
+            for (const [z, score] of Object.entries(state.scores)) {
+                if (score > maxScore) {
+                    maxScore = score;
+                    resultConst = z;
+                }
+            }
+            if (!resultConst) resultConst = '天秤';
+            state.resultConst = resultConst;
+
+            const data = CONSTELLATIONS[resultConst];
+            if (data) {
+                resultName.textContent = resultConst + '座';
+                resultMotto.textContent = data.motto;
+                resultDesc.innerHTML = data.desc;
+                resultTip.textContent = data.tip;
+                resultImage.src = `images/${resultConst}.png`;
+                resultImage.alt = `${resultConst}座插画`;
+
+                // 同步分享弹窗数据
+                shareNameModal.textContent = resultConst + '座';
+                shareImageModal.src = `images/${resultConst}.png`;
+                shareImageModal.alt = `${resultConst}座插画`;
+            }
+
+            showResult();
+        }
+
+        // ============================================================
+        //  12. 重新测试
+        // ============================================================
+        function resetTest() {
+            for (const z of Object.keys(state.scores)) {
+                state.scores[z] = 0;
+            }
+            state.current = 0;
+            state.answered = false;
+            state.selected = {};
+            state.resultConst = '';
+
+            progressFill.style.width = '0%';
+            sharkIcon.style.left = '0%';
+            progressText.textContent = '1 / 8';
+            progressPercent.textContent = '0%';
+
+            showQuiz();
+            renderQuestion(0);
+        }
+        retryBtn.addEventListener('click', resetTest);
+
+        // ============================================================
+        //  13. 开始测试 (封面 → 答题)
+        // ============================================================
+        btnStart.addEventListener('click', function() {
+            resetTest();
+        });
+
+        // ============================================================
+        //  14. 分享弹窗控制
+        // ============================================================
+        function openShareModal() {
+            if (state.resultConst) {
+                const data = CONSTELLATIONS[state.resultConst];
+                if (data) {
+                    shareNameModal.textContent = state.resultConst + '座';
+                    shareImageModal.src = `images/${state.resultConst}.png`;
+                    shareImageModal.alt = `${state.resultConst}座插画`;
+                }
+            }
+            shareOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeShareModal() {
+            shareOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        shareBtn.addEventListener('click', openShareModal);
+        shareCloseBtn.addEventListener('click', closeShareModal);
+        shareOverlay.addEventListener('click', function(e) {
+            if (e.target === shareOverlay) {
+                closeShareModal();
+            }
+        });
+
+        // ============================================================
+        //  15. 生成星星
+        // ============================================================
+        function createStars(containerId, count = 100, className = 'star') {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            let html = '';
+            for (let i = 0; i < count; i++) {
+                const x = Math.random() * 100;
+                const y = Math.random() * 100;
+                const size = 1.5 + Math.random() * 3.2;
+                const dur = 2 + Math.random() * 4;
+                const delay = Math.random() * 5;
+                const opacity = 0.25 + Math.random() * 0.5;
+                html += `<div class="${className}" style="
+                        left:${x}%;
+                        top:${y}%;
+                        width:${size}px;
+                        height:${size}px;
+                        --dur:${dur}s;
+                        --delay:${delay}s;
+                        opacity:${opacity};
+                    "></div>`;
+            }
+            container.innerHTML = html;
+        }
+        createStars('stars', 130, 'star');
+
+        // 分享弹窗星星
+        (function() {
+            const container = document.getElementById('shareStarsModal');
+            if (!container) return;
+            let html = '';
+            for (let i = 0; i < 50; i++) {
+                const x = Math.random() * 100;
+                const y = Math.random() * 100;
+                const size = 1.2 + Math.random() * 2.5;
+                const dur = 2 + Math.random() * 4;
+                const delay = Math.random() * 5;
+                const opacity = 0.2 + Math.random() * 0.5;
+                html += `<div class="share-star-modal" style="
+                        left:${x}%;
+                        top:${y}%;
+                        width:${size}px;
+                        height:${size}px;
+                        --dur:${dur}s;
+                        --delay:${delay}s;
+                        opacity:${opacity};
+                    "></div>`;
+            }
+            container.innerHTML = html;
+        })();
+
+        // ============================================================
+        //  16. 启动 - 默认显示封面
+        // ============================================================
+        showCover();
+
+        const coverImg = document.getElementById('coverImage');
+        coverImg.onerror = function() {
+            this.style.display = 'none';
+        };
+    </script>
+
+</body>
+</html>
